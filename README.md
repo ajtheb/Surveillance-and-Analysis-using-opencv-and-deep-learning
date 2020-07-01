@@ -1,5 +1,5 @@
 # Surveillance-and-Analysis-using-Image-Processing
-An Application which detects if the person is wearing mask or not to avoid the spread of CoVID 19 and tracks the movement of the person coming inside a building using pretained caffemodel and dlib tracker. It tracks the count and different features of the person and gives analysis to the organisation in a given period of time.
+An Application which detects if the person is wearing mask or not to avoid the spread of COVID 19 and tracks the movement of the person coming inside a building using pretained caffemodel and dlib tracker. It tracks the count and different features of the person and gives analysis to the organisation in a given period of time.
 
 Running the project
 1) Setup the enviroment with libraries given in requirements.txt

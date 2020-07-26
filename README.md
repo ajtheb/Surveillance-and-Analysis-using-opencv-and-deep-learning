@@ -8,8 +8,8 @@ Running the project
 
 Output of the program
 
-![output](https://github.com/ajtheb/Surveillance-and-Analysis-using-Image-Processing/raw/master/images/face.gif)
+               ![output](https://github.com/ajtheb/Surveillance-and-Analysis-using-Image-Processing/raw/master/images/face.gif)
 
 Mask model testing on images
 
-![testimages](https://github.com/ajtheb/Surveillance-and-Analysis-using-Image-Processing/raw/master/images/testing%20Mask.PNG)
+               ![testimages](https://github.com/ajtheb/Surveillance-and-Analysis-using-Image-Processing/raw/master/images/testing%20Mask.PNG)

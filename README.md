@@ -5,3 +5,11 @@ Running the project
 1) Setup the enviroment with libraries given in requirements.txt
 2) Open the track.py file and change the path of models and videos.
 3) Run the track.py file
+
+Output of the program
+
+![output](https://github.com/ajtheb/Surveillance-and-Analysis-using-Image-Processing/raw/master/images/face.gif)
+
+Mask model testing on images
+
+![testimages](https://github.com/ajtheb/Surveillance-and-Analysis-using-Image-Processing/raw/master/images/testing%20Mask.PNG)

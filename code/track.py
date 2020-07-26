@@ -8,7 +8,7 @@ import cv2
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
-#import tensorflow as tf
+
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-p", "--prototxt",
@@ -17,7 +17,7 @@ ap.add_argument("-p", "--prototxt",
 ap.add_argument("-m", "--model",
                 default='C:\\Users\\Apoorv Jain\\Documents\\multiobject-tracking-dlib\\res10_300x300_ssd_iter_140000.caffemodel',
                 help="path to Caffe pre-trained model")
-ap.add_argument("-v", "--video", default='C:\\Users\\Apoorv Jain\\Videos\\samples\\sample6.mp4',
+ap.add_argument("-v", "--video", default='C:\\Users\\Apoorv Jain\\Videos\\samples\\final1.mp4',
                 help="path to input video file")
 ap.add_argument("-o", "--output", type=str,
                 help="path to optional output video file")
@@ -26,13 +26,12 @@ ap.add_argument("-c", "--confidence", type=float, default=0.3,
 args = vars(ap.parse_args())
 
 
-
-mask_model='C:\\Users\\Apoorv Jain\\Documents\\face mask detector\\face-mask-detector\\mask_detector.model'
 # load our serialized model from disk
 print("[INFO] loading models (face detection and mask detection)...")
 #face detection
 net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
 #mask detection
+mask_model="C:\\Users\\Apoorv Jain\\Documents\\GitHub\\Surveillance-and-Analysis-using-Image-Processing\\model\\mask_model.model"
 maskNet = load_model(mask_model)
 
 
@@ -41,12 +40,18 @@ maskNet = load_model(mask_model)
 print("[INFO] starting video stream...")
 vs = cv2.VideoCapture(args["video"])
 writer = None
-
+fr_width=int(vs.get(3))
+fr_height=int(vs.get(4))
+fourcc = cv2.VideoWriter_fourcc(*'MPEG')
+fsize=(fr_width,fr_height)
+result = cv2.VideoWriter('output.avi', fourcc, 20.0, (640,480))
 # initialize the list of object trackers and corresponding class and labels
 trackers = []
 labels = []
 # count of faces
 faceCount = 0
+mask_cnt=0
+no_mask_cnt=0
 # start the frames per second throughput estimator
 fps = FPS().start()
 # 0 means not tracking now and 1 means tracking now
@@ -62,6 +67,7 @@ preds = []
 while True:
     # grab the next frame from the video file
     (grabbed, frame) = vs.read()
+
     # check to see if we have reached the end of the video file
     if frame is None:
         break
@@ -74,7 +80,7 @@ while True:
     # if args["output"] is not None and writer is None:
     # if there are no object trackers we first need to detect objects
     # and then create a tracker for each object
-    if not trackingFace:
+    if not trackingFace :
         (h, w) = rgb.shape[:2]
         blob = cv2.dnn.blobFromImage(cv2.resize(rgb, (300, 300)), 1.0,
                                      (300, 300), (104.0, 177.0, 123.0))
@@ -87,6 +93,8 @@ while True:
         c = 0
         # Calculating face Count
         faceCount-=prev
+        if(detections.shape[2]==0):
+            continue
         # loop over the detections
         for i in range(0, detections.shape[2]):
             # extract the confidence (i.e., probability) associated with the prediction
@@ -98,6 +106,10 @@ while True:
                 box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
                 (startX, startY, endX, endY) = box.astype("int")
 
+                if frame is None:
+                    continue
+                if grabbed == False:
+                    continue
                 # extract the face ROI, convert it from BGR to RGB channel
                 # ordering, resize it to 224x224, and preprocess it
                 face = frame[startY:endY, startX:endX]
@@ -111,7 +123,11 @@ while True:
                 preds = maskNet.predict(faces, batch_size=32)
                 (mask, withoutMask) = preds[0]
                 label = "Mask" if mask > withoutMask else "No Mask"
-                color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+                if(label=='Mask'):
+                    mask_cnt+=1
+                else:
+                    no_mask_cnt+=1
+                color = (0, 255, 0) if label == "Mask" else (0,0,255)
 
                 # include the probability in the label
                 label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
@@ -119,7 +135,7 @@ while True:
                 cv2.putText(frame, label, (startX, startY - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
                 cv2.rectangle(frame, (startX, startY), (endX, endY),
-                              (0, 0, 255), 2)
+                              color, 2)
                 faceCount+=1
                 # construct a dlib rectangle object from the bounding
                 # box coordinates and start the correlation tracker
@@ -172,6 +188,7 @@ while True:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
             else:
                 trackers.remove(t)
+                labels.remove(l)
         epoch_counter+=1
     print("faceCount", faceCount)
     #print("face detected", c)
@@ -181,6 +198,7 @@ while True:
 
     # show the output frame
     cv2.imshow("Frame", frame)
+    result.write(frame)
     key = cv2.waitKey(1) & 0xFF
 
     # if the `q` key was pressed, break from the loop
@@ -190,6 +208,8 @@ while True:
     # update the FPS counter
     fps.update()
 print("Number of people entered :",faceCount)
+print("Number of people with mask :",mask_cnt)
+print("Number of people without mask :",no_mask_cnt)
 # stop the timer and display FPS information
 fps.stop()
 
@@ -200,3 +220,4 @@ if writer is not None:
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.release()
+result.release()

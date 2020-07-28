@@ -6,6 +6,9 @@ Running the project
 2) Open the track.py file and change the path of models and videos.
 3) Run the track.py file
 
+Working=
+![wprking](https://github.com/ajtheb/Surveillance-and-Analysis-using-Image-Processing/raw/master/images/Capture.PNG)
+
 Output of the program
 
 ![output1](https://github.com/ajtheb/Surveillance-and-Analysis-using-Image-Processing/raw/master/Video/apoorv.gif)
@@ -14,3 +17,9 @@ Output of the program
 Mask model testing on images
 
 ![testimages](https://github.com/ajtheb/Surveillance-and-Analysis-using-Image-Processing/raw/master/images/testing%20Mask.PNG)
+
+Two Important files
+
+track.py
+Mask_Detection.ipynb
+
